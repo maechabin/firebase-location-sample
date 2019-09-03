@@ -1,0 +1,19 @@
+{
+  "hosting": [
+    {
+      "target": "firebase-leaflet-sample",
+      "public": "dist/firebase-leaflet-sample",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ]
+}

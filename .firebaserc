@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "maps-sample-a803c": {
+      "hosting": {
+        "firebase-leaflet-sample": [
+          "maps-sample-a803c"
+        ]
+      }
+    }
+  }
+}
