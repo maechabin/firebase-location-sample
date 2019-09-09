@@ -1,6 +1,7 @@
 import * as L from 'leaflet';
 
 import { Marker } from './map.model';
+import 'leaflet.gridlayer.googlemutant';
 
 declare module 'leaflet' {
   interface LeafletEvent {
@@ -13,8 +14,10 @@ export class Map {
   markers: {
     [id: number]: L.Marker;
   } = {};
+  locations: { [token: number]: L.Marker } = {};
+  locationList: { [token: number]: Marker } = {};
 
-  initMap(elem: HTMLElement) {
+  initMap(elem: any) {
     const token =
       'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
     /** Layer */
@@ -25,7 +28,7 @@ export class Map {
       {
         attribution: `
           Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors,
-          <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, 
+          <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,
           Imagery © <a href="https://www.mapbox.com/">Mapbox</a>
         `,
         maxZoom: 18,
@@ -50,6 +53,10 @@ export class Map {
       },
     );
 
+    const googlemaps = L.gridLayer.googleMutant({
+      type: 'roadmap', // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
+    });
+
     this.llmap = L.map(elem)
       .setView([35.69432984468491, 139.74267643565133], 12)
       .addLayer(streetsLayer);
@@ -58,6 +65,7 @@ export class Map {
       .layers({
         street: streetsLayer,
         satellite: satelliteLayer,
+        'google maps': googlemaps,
       })
       .addTo(this.llmap);
   }
@@ -69,7 +77,7 @@ export class Map {
       left: -12px;
       top: -12px;
       border-radius: 50%;
-      border: 8px solid ${marker.color};
+      border: 8px solid ${marker.color[0]};
       width: 8px;
       height: 8px;
     `;
@@ -78,7 +86,7 @@ export class Map {
       bottom: -30px;
       left: -6px;
       border: 10px solid transparent;
-      border-top: 17px solid ${marker.color};
+      border-top: 17px solid ${marker.color[0]};
     `;
     const icon = L.divIcon({
       className: 'marker-icon',
@@ -106,15 +114,59 @@ export class Map {
     this.llmap.removeLayer(this.markers[marker.id]);
   }
 
-  getCurrentPosition() {
-    this.llmap.locate({
-      watch: true,
-      enableHighAccuracy: true,
+  getLocation() {
+    if (this.llmap && this.llmap.locate) {
+      this.llmap.locate({
+        watch: true,
+        enableHighAccuracy: true,
+      });
+    }
+  }
+
+  stopGetLocation() {
+    this.llmap.stopLocate();
+    this.llmap.fire('locationstop');
+  }
+
+  removeLacateMarker(token: number) {
+    this.llmap.removeLayer(this.locations[token]);
+  }
+
+  putLocationMarker(marker: Marker) {
+    const markerHtmlStyles = `
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      top: 7px;
+      left: 7px;
+      box-shadow: 0 0 0 8px ${marker.color[1]};
+      border-radius: 50%;
+      border: 2px solid #fff;
+      background-color: ${marker.color[0]};
+    `;
+    const icon = L.divIcon({
+      className: 'marker-icon',
+      iconAnchor: [0, 24],
+      popupAnchor: [0, -36],
+      html: `
+        <span style="${markerHtmlStyles}" />
+      `,
     });
-    this.llmap.on('locationfound', (data: L.LeafletEvent) => {
-      console.log(
-        `現在地を取得しました: ${data.latlng.lat}, ${data.latlng.lng}`,
-      );
-    });
+
+    if (this.locations[marker.token]) {
+      this.llmap.removeLayer(this.locations[marker.token]);
+    }
+    this.locations[marker.token] = L.marker([marker.lat, marker.lng], {
+      icon,
+      draggable: false,
+    })
+      .addTo(this.llmap)
+      .on('click', () => {
+        this.panTo(marker.lat, marker.lng);
+      });
+  }
+
+  panTo(lat: number, lng: number) {
+    this.llmap.panTo(new L.LatLng(lat, lng));
   }
 }

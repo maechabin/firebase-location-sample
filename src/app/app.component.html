@@ -1,1 +1,12 @@
 <div id="map">...</div>
+<app-marker-list
+  [map]="map"
+  [markers]="markers"
+  [markerListLength]="markerListLength"
+  (listClick)="handleListClick($event)"
+></app-marker-list>
+<app-locate-button
+  [isDisabled]="isDisabled"
+  [isSharing]="isSharing"
+  (buttonClick)="handleButtonClick()"
+></app-locate-button>

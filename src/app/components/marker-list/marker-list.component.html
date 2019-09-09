@@ -1,0 +1,11 @@
+<ng-container *ngIf="markers && markerList.length !== 0">
+  <ul class="ul">
+    <li
+      *ngFor="let marker of markerList; let i = index"
+      class="li"
+      [style.background-color]="marker.color[0]"
+      [ngStyle]="colors[i]"
+      (click)="handleListClick({ lat: marker.lat, lng: marker.lng })"
+    ></li>
+  </ul>
+</ng-container>

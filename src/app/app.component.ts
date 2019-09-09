@@ -6,6 +6,7 @@ import {
 import { Observable } from 'rxjs';
 
 import { Map, Marker } from './domains/map';
+import * as helper from './core/helpers';
 
 @Component({
   selector: 'app-root',
@@ -15,10 +16,17 @@ import { Map, Marker } from './domains/map';
 export class AppComponent implements OnInit {
   private el: HTMLElement;
   private markerDocument: AngularFirestoreDocument<Marker>;
+  markers: { [token: number]: Marker } = {};
+  isDisabled = true;
+  isSharing = false;
   marker: Observable<Marker>;
   map = new Map();
   token = new Date().getTime();
-  color = this.getColorCode();
+  color = helper.getColorCode();
+
+  get markerListLength() {
+    return Object.values(this.markers).length;
+  }
 
   constructor(private elementRef: ElementRef, private afs: AngularFirestore) {
     this.markerDocument = afs.doc<Marker>('marker/GvQyEJEj19tVHvb2vDs0');
@@ -31,21 +39,55 @@ export class AppComponent implements OnInit {
     this.map.initMap(mapElem);
     this.marker.subscribe(marker => {
       this.handleMarkerRecieve(marker);
+      this.isDisabled = false;
     });
     this.handleMapClick();
   }
 
   handleMapClick() {
-    this.map.llmap.on('click', (e: L.LeafletEvent) => {
+    this.map.llmap.on('click', (event: L.LeafletEvent) => {
       const marker: Marker = {
         token: this.token,
         color: this.color,
         id: new Date().getTime(),
-        lat: e.latlng.lat,
-        lng: e.latlng.lng,
+        lat: event.latlng.lat,
+        lng: event.latlng.lng,
         task: 'put',
       };
       this.markerDocument.update(marker);
+    });
+
+    this.map.llmap.on('locationfound', (event: L.LeafletEvent) => {
+      this.isDisabled = true;
+      console.log(
+        `現在地を取得しました: ${event.latlng.lat}, ${event.latlng.lng}`,
+      );
+
+      const marker: Marker = {
+        token: this.token,
+        color: this.color,
+        id: new Date().getTime(),
+        lat: event.latlng.lat,
+        lng: event.latlng.lng,
+        task: 'location',
+      };
+      this.markerDocument.update(marker);
+    });
+
+    this.map.llmap.on('locationstop', () => {
+      const marker: Marker = {
+        token: this.token,
+        color: this.color,
+        id: new Date().getTime(),
+        lat: NaN,
+        lng: NaN,
+        task: 'removeLocation',
+      };
+      this.markerDocument.update(marker);
+    });
+
+    this.map.llmap.on('locationerror', error => {
+      console.error(error);
     });
   }
 
@@ -94,12 +136,44 @@ export class AppComponent implements OnInit {
       case 'remove':
         this.map.removeMarker(sendedMarker);
         break;
+      case 'location':
+        if (
+          !this.map.locations[sendedMarker.token] &&
+          sendedMarker.token === this.token
+        ) {
+          this.map.panTo(sendedMarker.lat, sendedMarker.lng);
+        }
+
+        if (!this.map.locationList[sendedMarker.token]) {
+          this.map.locationList = {
+            ...this.map.locationList,
+            [sendedMarker.token]: sendedMarker,
+          };
+        }
+        this.markers = this.map.locationList;
+        this.map.putLocationMarker(sendedMarker);
+        this.isDisabled = false;
+        break;
+      case 'removeLocation':
+        delete this.map.locationList[sendedMarker.token];
+        this.markers = this.map.locationList;
+        this.map.removeLacateMarker(sendedMarker.token);
+        this.isDisabled = false;
+        break;
     }
   }
 
-  private getColorCode() {
-    // tslint:disable-next-line: no-bitwise
-    const color = ((Math.random() * 0xffffff) | 0).toString(16);
-    return `#${('000000' + color).slice(-6)}`;
+  handleButtonClick() {
+    this.isDisabled = true;
+    if (this.isSharing) {
+      this.map.stopGetLocation();
+    } else {
+      this.map.getLocation();
+    }
+    this.isSharing = !this.isSharing;
+  }
+
+  handleListClick(marker: { lat: number; lng: number }) {
+    this.map.panTo(marker.lat, marker.lng);
   }
 }
