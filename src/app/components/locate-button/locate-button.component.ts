@@ -5,6 +5,8 @@ import {
   EventEmitter,
   OnChanges,
 } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { auth } from 'firebase/app';
 
 @Component({
   selector: 'app-locate-button',
@@ -18,6 +20,8 @@ export class LocateButtonComponent implements OnChanges {
 
   buttonLabel: string;
 
+  constructor(public afAuth: AngularFireAuth) {}
+
   ngOnChanges() {
     this.buttonLabel = this.isSharing
       ? '現在地の共有を停止する'
@@ -26,5 +30,9 @@ export class LocateButtonComponent implements OnChanges {
 
   handleButtonClick() {
     this.buttonClick.emit();
+  }
+
+  logout() {
+    this.afAuth.auth.signOut();
   }
 }

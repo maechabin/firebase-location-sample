@@ -62,11 +62,15 @@ export class Map {
       .addLayer(streetsLayer);
 
     L.control
-      .layers({
-        street: streetsLayer,
-        satellite: satelliteLayer,
-        'google maps': googlemaps,
-      })
+      .layers(
+        {
+          street: streetsLayer,
+          satellite: satelliteLayer,
+          'google maps': googlemaps,
+        },
+        {},
+        { position: 'bottomright' },
+      )
       .addTo(this.llmap);
   }
 
@@ -90,8 +94,7 @@ export class Map {
     `;
     const icon = L.divIcon({
       className: 'marker-icon',
-      iconAnchor: [0, 24],
-      popupAnchor: [0, -36],
+      iconAnchor: [0, 0],
       html: `
         <span style="${markerHtmlStyles1}" />
         <span style="${markerHtmlStyles2}" />

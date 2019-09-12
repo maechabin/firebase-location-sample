@@ -3,6 +3,8 @@ import {
   AngularFirestore,
   AngularFirestoreDocument,
 } from '@angular/fire/firestore';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { auth } from 'firebase/app';
 import { Observable } from 'rxjs';
 
 import { Map, Marker } from './domains/map';
@@ -20,28 +22,47 @@ export class AppComponent implements OnInit {
   isDisabled = true;
   isSharing = false;
   marker: Observable<Marker>;
-  map = new Map();
-  token = new Date().getTime();
-  color = helper.getColorCode();
+
+  readonly map = new Map();
+  readonly token = new Date().getTime();
+  readonly color = helper.getColorCode();
 
   get markerListLength() {
     return Object.values(this.markers).length;
   }
 
-  constructor(private elementRef: ElementRef, private afs: AngularFirestore) {
+  user$ = this.afAuth.user;
+
+  constructor(
+    public afAuth: AngularFireAuth,
+    private elementRef: ElementRef,
+    private afs: AngularFirestore,
+  ) {
     this.markerDocument = afs.doc<Marker>('marker/GvQyEJEj19tVHvb2vDs0');
     this.marker = this.markerDocument.valueChanges();
   }
 
   ngOnInit() {
-    this.el = this.elementRef.nativeElement;
-    const mapElem = this.el.querySelector('#map') as HTMLElement;
-    this.map.initMap(mapElem);
-    this.marker.subscribe(marker => {
-      this.handleMarkerRecieve(marker);
-      this.isDisabled = false;
+    this.user$.subscribe(user => {
+      if (user) {
+        console.log(user);
+        setTimeout(() => {
+          this.el = this.elementRef.nativeElement;
+          const mapElem = this.el.querySelector('#map') as HTMLElement;
+          console.log(mapElem);
+          this.map.initMap(mapElem);
+          this.marker.subscribe(marker => {
+            this.handleMarkerRecieve(marker);
+            this.isDisabled = false;
+          });
+          this.handleMapClick();
+        }, 3000);
+      }
     });
-    this.handleMapClick();
+  }
+
+  login() {
+    this.afAuth.auth.signInWithPopup(new auth.GoogleAuthProvider());
   }
 
   handleMapClick() {
@@ -87,7 +108,9 @@ export class AppComponent implements OnInit {
     });
 
     this.map.llmap.on('locationerror', error => {
-      console.error(error);
+      console.error(`現在地を取得できませんでした`);
+      this.isSharing = false;
+      this.isDisabled = false;
     });
   }
 

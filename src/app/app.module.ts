@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFireAuth } from '@angular/fire/auth';
 import { CommonModule } from '@angular/common';
 
 import { environment } from '../environments/environment';
@@ -22,7 +23,7 @@ import { MarkerListComponent } from './components/marker-list/marker-list.compon
     CommonModule,
     AngularFireModule.initializeApp(environment.firebase),
   ],
-  providers: [AngularFirestore],
+  providers: [AngularFirestore, AngularFireAuth],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
