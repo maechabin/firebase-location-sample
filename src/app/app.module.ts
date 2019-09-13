@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { LLMapComponent } from './components/llmap/llmap.component';
+import { LoginButtonComponent } from './components/login-button/login-button.component';
 import { LocateButtonComponent } from './components/locate-button/locate-button.component';
 import { MarkerListComponent } from './components/marker-list/marker-list.component';
 
@@ -15,6 +16,7 @@ import { MarkerListComponent } from './components/marker-list/marker-list.compon
   declarations: [
     AppComponent,
     LLMapComponent,
+    LoginButtonComponent,
     LocateButtonComponent,
     MarkerListComponent,
   ],

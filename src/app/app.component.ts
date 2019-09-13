@@ -11,6 +11,8 @@ import { takeUntil } from 'rxjs/operators';
 import { Map, Marker } from './domains/map';
 import * as helper from './core/helpers';
 
+type LoginState = 'login' | 'logout';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -66,10 +68,6 @@ export class AppComponent implements OnInit {
         this.onDestroy$.emit();
       }
     });
-  }
-
-  login() {
-    this.afAuth.auth.signInWithPopup(new auth.GoogleAuthProvider());
   }
 
   handleMapClick() {
@@ -195,6 +193,23 @@ export class AppComponent implements OnInit {
         this.map.removeLacateMarker(sendedMarker.token);
         this.isDisabled = false;
         break;
+    }
+  }
+
+  login() {
+    this.afAuth.auth.signInWithPopup(new auth.GoogleAuthProvider());
+  }
+
+  logout() {
+    this.afAuth.auth.signOut();
+  }
+
+  handleLoginButtonClick(loginState: LoginState) {
+    if (loginState === 'login') {
+      this.login();
+    }
+    if (loginState === 'logout') {
+      this.logout();
     }
   }
 

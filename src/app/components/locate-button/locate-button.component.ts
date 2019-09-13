@@ -31,8 +31,4 @@ export class LocateButtonComponent implements OnChanges {
   handleButtonClick() {
     this.buttonClick.emit();
   }
-
-  logout() {
-    this.afAuth.auth.signOut();
-  }
 }

@@ -5,21 +5,9 @@
   z-index: 1000;
   width: 160px;
   line-height: 32px;
-  border: 1px solid #999;
+  border: 1px solid #d81b60;
   border-radius: 4px;
-  background-color: #fff;
-  cursor: pointer;
-}
-
-.button-logout {
-  position: absolute;
-  left: 10px;
-  bottom: 32px;
-  z-index: 1000;
-  width: 128px;
-  line-height: 32px;
-  border: 1px solid #999;
-  border-radius: 4px;
-  background-color: #fff;
+  background-color: #d81b60;
+  color: #fff;
   cursor: pointer;
 }

@@ -1,5 +1,5 @@
 <div id="map">...</div>
-<div *ngIf="afAuth.user | async as user; else showLogin">
+<div *ngIf="user$ | async as user; else showLogin">
   <app-marker-list
     [map]="map"
     [markers]="markers"
@@ -11,7 +11,14 @@
     [isSharing]="isSharing"
     (buttonClick)="handleButtonClick()"
   ></app-locate-button>
+  <app-login-button
+    loginState="logout"
+    (buttonClick)="handleLoginButtonClick($event)"
+  ></app-login-button>
 </div>
 <ng-template #showLogin>
-  <button (click)="login()" class="button-logout">Login with Google</button>
+  <app-login-button
+    loginState="login"
+    (buttonClick)="handleLoginButtonClick($event)"
+  ></app-login-button>
 </ng-template>
