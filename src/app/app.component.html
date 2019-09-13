@@ -1,5 +1,5 @@
+<div id="map">...</div>
 <div *ngIf="afAuth.user | async as user; else showLogin">
-  <div id="map">...</div>
   <app-marker-list
     [map]="map"
     [markers]="markers"
@@ -13,6 +13,5 @@
   ></app-locate-button>
 </div>
 <ng-template #showLogin>
-  <p>Please login.</p>
-  <button (click)="login()">Login with Google</button>
+  <button (click)="login()" class="button-logout">Login with Google</button>
 </ng-template>

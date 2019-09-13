@@ -12,10 +12,15 @@
 }
 
 .li {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: 2px solid #fff;
   cursor: pointer;
   margin: 24px 0;
+}
+
+.img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  padding: 0;
+  vertical-align: middle;
 }

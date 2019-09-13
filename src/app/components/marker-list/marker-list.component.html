@@ -2,10 +2,15 @@
   <ul class="ul">
     <li
       *ngFor="let marker of markerList; let i = index"
-      class="li"
-      [style.background-color]="marker.color[0]"
-      [ngStyle]="colors[i]"
       (click)="handleListClick({ lat: marker.lat, lng: marker.lng })"
-    ></li>
+      class="li"
+    >
+      <img
+        [src]="marker.userPhoto"
+        [style.background-color]="marker.color[0]"
+        [ngStyle]="colors[i]"
+        class="img"
+      />
+    </li>
   </ul>
 </ng-container>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef, EventEmitter } from '@angular/core';
 import {
   AngularFirestore,
   AngularFirestoreDocument,
@@ -6,6 +6,7 @@ import {
 import { AngularFireAuth } from '@angular/fire/auth';
 import { auth } from 'firebase/app';
 import { Observable } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { Map, Marker } from './domains/map';
 import * as helper from './core/helpers';
@@ -26,6 +27,9 @@ export class AppComponent implements OnInit {
   readonly map = new Map();
   readonly token = new Date().getTime();
   readonly color = helper.getColorCode();
+  userPhoto = '';
+
+  private readonly onDestroy$ = new EventEmitter();
 
   get markerListLength() {
     return Object.values(this.markers).length;
@@ -43,20 +47,23 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.el = this.elementRef.nativeElement;
+    const mapElem = this.el.querySelector('#map') as HTMLElement;
+    this.map.initMap(mapElem);
+
     this.user$.subscribe(user => {
       if (user) {
         console.log(user);
+        this.userPhoto = user.photoURL;
         setTimeout(() => {
-          this.el = this.elementRef.nativeElement;
-          const mapElem = this.el.querySelector('#map') as HTMLElement;
-          console.log(mapElem);
-          this.map.initMap(mapElem);
-          this.marker.subscribe(marker => {
+          this.marker.pipe(takeUntil(this.onDestroy$)).subscribe(marker => {
             this.handleMarkerRecieve(marker);
             this.isDisabled = false;
           });
           this.handleMapClick();
-        }, 3000);
+        }, 300);
+      } else {
+        this.onDestroy$.emit();
       }
     });
   }
@@ -69,6 +76,7 @@ export class AppComponent implements OnInit {
     this.map.llmap.on('click', (event: L.LeafletEvent) => {
       const marker: Marker = {
         token: this.token,
+        userPhoto: this.userPhoto,
         color: this.color,
         id: new Date().getTime(),
         lat: event.latlng.lat,
@@ -86,6 +94,7 @@ export class AppComponent implements OnInit {
 
       const marker: Marker = {
         token: this.token,
+        userPhoto: this.userPhoto,
         color: this.color,
         id: new Date().getTime(),
         lat: event.latlng.lat,
@@ -98,6 +107,7 @@ export class AppComponent implements OnInit {
     this.map.llmap.on('locationstop', () => {
       const marker: Marker = {
         token: this.token,
+        userPhoto: this.userPhoto,
         color: this.color,
         id: new Date().getTime(),
         lat: NaN,
@@ -129,6 +139,7 @@ export class AppComponent implements OnInit {
           timer = setTimeout(() => {
             const marker: Marker = {
               token: this.token,
+              userPhoto: this.userPhoto,
               color: this.color,
               id: m.id,
               lat: e.latlng.lat,
@@ -142,6 +153,7 @@ export class AppComponent implements OnInit {
         m.marker.on('click', (e: L.LeafletEvent) => {
           const marker: Marker = {
             token: this.token,
+            userPhoto: this.userPhoto,
             color: this.color,
             id: m.id,
             lat: e.latlng.lat,
