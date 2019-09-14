@@ -4,6 +4,9 @@
       "hosting": {
         "firebase-leaflet-sample": [
           "maps-sample-a803c"
+        ],
+        "share-latlng": [
+          "share-latlng"
         ]
       }
     }
