@@ -6,7 +6,7 @@ import {
   EventEmitter,
 } from '@angular/core';
 
-import { Map, Marker } from '../../domains/map';
+import { LLMap, Marker } from '../../../domains/llmap';
 
 @Component({
   selector: 'app-marker-list',
@@ -14,7 +14,7 @@ import { Map, Marker } from '../../domains/map';
   styleUrls: ['./marker-list.component.scss'],
 })
 export class MarkerListComponent implements OnChanges {
-  @Input() map: Map;
+  @Input() map: LLMap;
   @Input() markers: { [token: number]: Marker };
   @Input() markerListLength: number;
   @Output() listClick = new EventEmitter<{ lat: number; lng: number }>();

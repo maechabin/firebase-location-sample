@@ -1,6 +1,6 @@
 import * as L from 'leaflet';
 
-import { Marker } from './map.model';
+import { Marker } from './llmap.model';
 import 'leaflet.gridlayer.googlemutant';
 
 declare module 'leaflet' {
@@ -9,7 +9,7 @@ declare module 'leaflet' {
   }
 }
 
-export class Map {
+export class LLMap {
   llmap!: L.Map;
   markers: {
     [id: number]: L.Marker;
@@ -166,7 +166,9 @@ export class Map {
       .addTo(this.llmap)
       .on('click', () => {
         this.panTo(marker.lat, marker.lng);
-      });
+      })
+      .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+      .openPopup();
   }
 
   panTo(lat: number, lng: number) {
