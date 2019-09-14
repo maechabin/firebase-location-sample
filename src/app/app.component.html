@@ -2,7 +2,7 @@
 <div *ngIf="user$ | async as user; else showLogin">
   <app-marker-list
     [map]="map"
-    [markers]="markers"
+    [markers]="locateMarkers"
     [markerListLength]="markerListLength"
     (listClick)="handleListClick($event)"
   ></app-marker-list>

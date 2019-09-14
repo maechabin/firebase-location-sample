@@ -21,7 +21,8 @@ type LoginState = 'login' | 'logout';
 export class AppComponent implements OnInit {
   private el: HTMLElement;
   private markerDocument: AngularFirestoreDocument<Marker>;
-  markers: { [token: number]: Marker } = {};
+  locateMarkers: { [token: number]: Marker } = {};
+  latlngMarkers: { [id: number]: L.Marker } = {};
   isDisabled = true;
   isSharing = false;
   marker: Observable<Marker>;
@@ -34,7 +35,7 @@ export class AppComponent implements OnInit {
   private readonly onDestroy$ = new EventEmitter();
 
   get markerListLength() {
-    return Object.values(this.markers).length;
+    return Object.values(this.locateMarkers).length;
   }
 
   user$ = this.afAuth.user;
@@ -55,7 +56,6 @@ export class AppComponent implements OnInit {
 
     this.user$.subscribe(user => {
       if (user) {
-        console.log(user);
         this.userPhoto = user.photoURL;
         setTimeout(() => {
           this.marker.pipe(takeUntil(this.onDestroy$)).subscribe(marker => {
@@ -130,6 +130,7 @@ export class AppComponent implements OnInit {
     switch (sendedMarker.task) {
       case 'put':
         const m = this.map.putMarker(sendedMarker);
+        this.latlngMarkers[m.id] = m.marker;
         let timer: any;
 
         m.marker.on('drag', (e: L.LeafletEvent) => {
@@ -183,13 +184,13 @@ export class AppComponent implements OnInit {
             [sendedMarker.token]: sendedMarker,
           };
         }
-        this.markers = this.map.locationList;
+        this.locateMarkers = this.map.locationList;
         this.map.putLocationMarker(sendedMarker);
         this.isDisabled = false;
         break;
       case 'removeLocation':
         delete this.map.locationList[sendedMarker.token];
-        this.markers = this.map.locationList;
+        this.locateMarkers = this.map.locationList;
         this.map.removeLacateMarker(sendedMarker.token);
         this.isDisabled = false;
         break;
@@ -201,6 +202,10 @@ export class AppComponent implements OnInit {
   }
 
   logout() {
+    Object.values(this.latlngMarkers).forEach((marker: L.Marker) => {
+      this.map.llmap.removeLayer(marker);
+    });
+    this.handleButtonClick();
     this.afAuth.auth.signOut();
   }
 
