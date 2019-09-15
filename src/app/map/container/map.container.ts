@@ -10,6 +10,8 @@ import { takeUntil } from 'rxjs/operators';
 
 import { LLMap, Marker } from '../../domains/llmap';
 import * as helper from '../../core/helpers';
+import { MapService } from '../service/map.service';
+import { LoginService } from '../service/login.service';
 
 type LoginState = 'login' | 'logout';
 
@@ -44,6 +46,8 @@ export class MapContainerComponent implements OnInit {
     public afAuth: AngularFireAuth,
     private elementRef: ElementRef,
     private afs: AngularFirestore,
+    private mapService: MapService,
+    private loginService: LoginService,
   ) {
     this.markerDocument = afs.doc<Marker>('marker/GvQyEJEj19tVHvb2vDs0');
     this.marker = this.markerDocument.valueChanges();
