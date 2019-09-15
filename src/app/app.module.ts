@@ -7,26 +7,17 @@ import { CommonModule } from '@angular/common';
 
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
-import { MapContainerComponent } from './map/container/map.container';
-import { LLMapComponent } from './map/components/llmap/llmap.component';
-import { LoginButtonComponent } from './map/components/login-button/login-button.component';
-import { LocateButtonComponent } from './map/components/locate-button/locate-button.component';
-import { MarkerListComponent } from './map/components/marker-list/marker-list.component';
+import { MapModule } from './map/map.module';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    MapContainerComponent,
-    LLMapComponent,
-    LoginButtonComponent,
-    LocateButtonComponent,
-    MarkerListComponent,
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     CommonModule,
     AngularFireModule.initializeApp(environment.firebase),
+    MapModule,
   ],
+  exports: [],
   providers: [AngularFirestore, AngularFireAuth],
   bootstrap: [AppComponent],
 })
