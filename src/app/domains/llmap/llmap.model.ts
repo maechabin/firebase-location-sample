@@ -1,5 +1,6 @@
 export interface Marker {
   token: number;
+  uid: string;
   userPhoto: string;
   color: string[];
   id: number;

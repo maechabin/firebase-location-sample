@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { MapModule } from './modules/map/map.module';
+import { CommentModule } from './modules/comment/comment.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -16,6 +17,7 @@ import { MapModule } from './modules/map/map.module';
     CommonModule,
     AngularFireModule.initializeApp(environment.firebase),
     MapModule,
+    CommentModule,
   ],
   exports: [],
   providers: [AngularFirestore, AngularFireAuth],

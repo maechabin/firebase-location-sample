@@ -1,0 +1,29 @@
+.comment {
+  width: 100%;
+  background-color: #eee;
+  box-sizing: border-box;
+  padding: 8px;
+  position: absolute;
+  bottom: 0;
+  height: 56px;
+  display: flex;
+
+  input {
+    height: 100%;
+    box-sizing: border-box;
+    width: calc(100% - 80px);
+    border: 1px solid #999;
+    font-size: 20px;
+    padding: 0 8px;
+  }
+
+  button {
+    margin: 0;
+    height: 100%;
+    box-sizing: border-box;
+    border: none;
+    width: 80px;
+    background-color: #1976d2;
+    color: #fff;
+  }
+}

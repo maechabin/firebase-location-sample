@@ -2,11 +2,20 @@ import * as L from 'leaflet';
 
 import { Marker } from './llmap.model';
 import 'leaflet.gridlayer.googlemutant';
+import { CommentStmt } from '@angular/compiler';
 
 declare module 'leaflet' {
   interface LeafletEvent {
     latlng: LatLng;
   }
+}
+
+interface Comment {
+  uid: string;
+  comment: string;
+  // lat: number;
+  // lng: number;
+  // date: number;
 }
 
 export class LLMap {
@@ -131,11 +140,11 @@ export class LLMap {
     this.llmap.fire('locationstop');
   }
 
-  removeLacateMarker(token: number) {
-    this.llmap.removeLayer(this.locations[token]);
+  removeLacateMarker(uid: string) {
+    this.llmap.removeLayer(this.locations[uid]);
   }
 
-  putLocationMarker(marker: Marker) {
+  putLocationMarker(marker: Marker, comment: string) {
     const markerHtmlStyles = `
       position: absolute;
       width: 10px;
@@ -154,10 +163,10 @@ export class LLMap {
       `,
     });
 
-    if (this.locations[marker.token]) {
-      this.llmap.removeLayer(this.locations[marker.token]);
+    if (this.locations[marker.uid]) {
+      this.llmap.removeLayer(this.locations[marker.uid]);
     }
-    this.locations[marker.token] = L.marker([marker.lat, marker.lng], {
+    this.locations[marker.uid] = L.marker([marker.lat, marker.lng], {
       icon,
       draggable: false,
     })
@@ -165,8 +174,21 @@ export class LLMap {
       .on('click', () => {
         this.panTo(marker.lat, marker.lng);
       })
-      .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+      .bindPopup(comment, {
+        closeButton: false,
+        autoClose: false,
+        keepInView: true,
+        closeOnClick: false,
+      })
       .openPopup();
+  }
+
+  setComment(comments: Comment[]) {
+    comments.forEach(comment => {
+      if (this.locations[comment.uid]) {
+        this.locations[comment.uid].setPopupContent(comment.comment);
+      }
+    });
   }
 
   panTo(lat: number, lng: number) {
