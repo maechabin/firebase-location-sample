@@ -117,17 +117,22 @@ export class MapContainerComponent implements OnInit {
         `現在地を取得しました: ${event.latlng.lat}, ${event.latlng.lng}`,
       );
 
-      const marker: Marker = {
-        token: this.token,
-        uid: this.uid,
-        userPhoto: this.userPhoto,
-        color: this.color,
-        id: new Date().getTime(),
-        lat: event.latlng.lat,
-        lng: event.latlng.lng,
-        task: 'location',
-      };
-      this.markerDocument.update(marker);
+      let timer: any;
+
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const marker: Marker = {
+          token: this.token,
+          uid: this.uid,
+          userPhoto: this.userPhoto,
+          color: this.color,
+          id: new Date().getTime(),
+          lat: event.latlng.lat,
+          lng: event.latlng.lng,
+          task: 'location',
+        };
+        this.markerDocument.update(marker);
+      }, 5000);
     });
 
     this.map.llmap.on('locationstop', () => {
