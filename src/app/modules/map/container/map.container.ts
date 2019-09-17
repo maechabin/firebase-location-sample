@@ -45,7 +45,7 @@ export class MapContainerComponent implements OnInit {
 
   private uid = '';
   private userPhoto = '';
-  private comment = `I'm here now`;
+  private comments: Comment[];
 
   private readonly onDestroy$ = new EventEmitter();
 
@@ -91,11 +91,7 @@ export class MapContainerComponent implements OnInit {
     });
 
     this.comments$.subscribe((comments: Comment[]) => {
-      comments.forEach(comment => {
-        if (this.uid === comment.uid) {
-          this.comment = comment.comment;
-        }
-      });
+      this.comments = comments;
       this.map.setComment(comments);
     });
   }
@@ -221,8 +217,12 @@ export class MapContainerComponent implements OnInit {
         }
         this.locateMarkers = this.map.locationList;
         setTimeout(() => {
-          this.map.putLocationMarker(sendedMarker, this.comment);
-        }, 500);
+          const comment = this.comments.find(c => c.uid === sendedMarker.uid);
+          this.map.putLocationMarker(
+            sendedMarker,
+            (comment && comment.comment) || `I'm here now`,
+          );
+        }, 0);
 
         this.isDisabled = false;
         break;
