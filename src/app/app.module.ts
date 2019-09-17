@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
-import { MapModule } from './map/map.module';
+import { MapModule } from './modules/map/map.module';
 
 @NgModule({
   declarations: [AppComponent],

@@ -2,18 +2,26 @@ import { Component, OnInit, ElementRef, EventEmitter } from '@angular/core';
 import {
   AngularFirestore,
   AngularFirestoreDocument,
+  AngularFirestoreCollection,
 } from '@angular/fire/firestore';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { auth } from 'firebase/app';
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { LLMap, Marker } from '../../domains/llmap';
-import * as helper from '../../core/helpers';
+import { LLMap, Marker } from '../../../domains/llmap';
+import * as helper from '../../../core/helpers';
 import { MapService } from '../service/map.service';
 import { LoginService } from '../service/login.service';
 
 type LoginState = 'login' | 'logout';
+interface Comment {
+  uid: string;
+  comment: string;
+  // lat: number;
+  // lng: number;
+  // date: number;
+}
 
 @Component({
   selector: 'app-map',
@@ -23,6 +31,8 @@ type LoginState = 'login' | 'logout';
 export class MapContainerComponent implements OnInit {
   private el: HTMLElement;
   private markerDocument: AngularFirestoreDocument<Marker>;
+  private commentsCollection: AngularFirestoreCollection<Comment>;
+
   locateMarkers: { [token: number]: Marker } = {};
   latlngMarkers: { [id: number]: L.Marker } = {};
   isDisabled = true;
@@ -32,7 +42,10 @@ export class MapContainerComponent implements OnInit {
   readonly map = new LLMap();
   readonly token = new Date().getTime();
   readonly color = helper.getColorCode();
-  userPhoto = '';
+
+  private uid = '';
+  private userPhoto = '';
+  private comment = `I'm here now`;
 
   private readonly onDestroy$ = new EventEmitter();
 
@@ -41,6 +54,7 @@ export class MapContainerComponent implements OnInit {
   }
 
   user$ = this.afAuth.user;
+  comments$: Observable<Comment[]>;
 
   constructor(
     public afAuth: AngularFireAuth,
@@ -51,6 +65,8 @@ export class MapContainerComponent implements OnInit {
   ) {
     this.markerDocument = afs.doc<Marker>('marker/GvQyEJEj19tVHvb2vDs0');
     this.marker = this.markerDocument.valueChanges();
+    this.commentsCollection = afs.collection<Comment>('comments');
+    this.comments$ = this.commentsCollection.valueChanges();
   }
 
   ngOnInit() {
@@ -60,6 +76,7 @@ export class MapContainerComponent implements OnInit {
 
     this.user$.subscribe(user => {
       if (user) {
+        this.uid = user.uid;
         this.userPhoto = user.photoURL;
         setTimeout(() => {
           this.marker.pipe(takeUntil(this.onDestroy$)).subscribe(marker => {
@@ -72,12 +89,22 @@ export class MapContainerComponent implements OnInit {
         this.onDestroy$.emit();
       }
     });
+
+    this.comments$.subscribe((comments: Comment[]) => {
+      comments.forEach(comment => {
+        if (this.uid === comment.uid) {
+          this.comment = comment.comment;
+        }
+      });
+      this.map.setComment(comments);
+    });
   }
 
   handleMapClick() {
     this.map.llmap.on('click', (event: L.LeafletEvent) => {
       const marker: Marker = {
         token: this.token,
+        uid: this.uid,
         userPhoto: this.userPhoto,
         color: this.color,
         id: new Date().getTime(),
@@ -96,6 +123,7 @@ export class MapContainerComponent implements OnInit {
 
       const marker: Marker = {
         token: this.token,
+        uid: this.uid,
         userPhoto: this.userPhoto,
         color: this.color,
         id: new Date().getTime(),
@@ -109,6 +137,7 @@ export class MapContainerComponent implements OnInit {
     this.map.llmap.on('locationstop', () => {
       const marker: Marker = {
         token: this.token,
+        uid: this.uid,
         userPhoto: this.userPhoto,
         color: this.color,
         id: new Date().getTime(),
@@ -142,6 +171,7 @@ export class MapContainerComponent implements OnInit {
           timer = setTimeout(() => {
             const marker: Marker = {
               token: this.token,
+              uid: this.uid,
               userPhoto: this.userPhoto,
               color: this.color,
               id: m.id,
@@ -156,6 +186,7 @@ export class MapContainerComponent implements OnInit {
         m.marker.on('click', (e: L.LeafletEvent) => {
           const marker: Marker = {
             token: this.token,
+            uid: this.uid,
             userPhoto: this.userPhoto,
             color: this.color,
             id: m.id,
@@ -176,26 +207,29 @@ export class MapContainerComponent implements OnInit {
         break;
       case 'location':
         if (
-          !this.map.locations[sendedMarker.token] &&
-          sendedMarker.token === this.token
+          !this.map.locations[sendedMarker.uid] &&
+          sendedMarker.uid === this.uid
         ) {
           this.map.panTo(sendedMarker.lat, sendedMarker.lng);
         }
 
-        if (!this.map.locationList[sendedMarker.token]) {
+        if (!this.map.locationList[sendedMarker.uid]) {
           this.map.locationList = {
             ...this.map.locationList,
-            [sendedMarker.token]: sendedMarker,
+            [sendedMarker.uid]: sendedMarker,
           };
         }
         this.locateMarkers = this.map.locationList;
-        this.map.putLocationMarker(sendedMarker);
+        setTimeout(() => {
+          this.map.putLocationMarker(sendedMarker, this.comment);
+        }, 500);
+
         this.isDisabled = false;
         break;
       case 'removeLocation':
-        delete this.map.locationList[sendedMarker.token];
+        delete this.map.locationList[sendedMarker.uid];
         this.locateMarkers = this.map.locationList;
-        this.map.removeLacateMarker(sendedMarker.token);
+        this.map.removeLacateMarker(sendedMarker.uid);
         this.isDisabled = false;
         break;
     }
