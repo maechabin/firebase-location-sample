@@ -2,7 +2,6 @@ import * as L from 'leaflet';
 
 import { Marker } from './llmap.model';
 import 'leaflet.gridlayer.googlemutant';
-import { CommentStmt } from '@angular/compiler';
 
 declare module 'leaflet' {
   interface LeafletEvent {
@@ -131,6 +130,7 @@ export class LLMap {
       this.llmap.locate({
         watch: true,
         enableHighAccuracy: true,
+        maximumAge: 5000,
       });
     }
   }

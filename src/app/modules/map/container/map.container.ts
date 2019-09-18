@@ -46,6 +46,7 @@ export class MapContainerComponent implements OnInit {
   private uid = '';
   private userPhoto = '';
   private comments: Comment[];
+  timeInterval: number;
 
   private readonly onDestroy$ = new EventEmitter();
 
@@ -117,22 +118,21 @@ export class MapContainerComponent implements OnInit {
         `現在地を取得しました: ${event.latlng.lat}, ${event.latlng.lng}`,
       );
 
-      let timer: any;
+      const marker: Marker = {
+        token: this.token,
+        uid: this.uid,
+        userPhoto: this.userPhoto,
+        color: this.color,
+        id: new Date().getTime(),
+        lat: event.latlng.lat,
+        lng: event.latlng.lng,
+        task: 'location',
+      };
 
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        const marker: Marker = {
-          token: this.token,
-          uid: this.uid,
-          userPhoto: this.userPhoto,
-          color: this.color,
-          id: new Date().getTime(),
-          lat: event.latlng.lat,
-          lng: event.latlng.lng,
-          task: 'location',
-        };
+      if (!this.timeInterval || marker.id - this.timeInterval > 5000) {
         this.markerDocument.update(marker);
-      }, 5000);
+        this.timeInterval = marker.id;
+      }
     });
 
     this.map.llmap.on('locationstop', () => {
@@ -165,7 +165,6 @@ export class MapContainerComponent implements OnInit {
       case 'put':
         const m = this.map.putMarker(sendedMarker);
         this.latlngMarkers[m.id] = m.marker;
-        let timer: any;
 
         m.marker.on('dragend', (event: L.LeafletEvent) => {
           const marker: Marker = {
