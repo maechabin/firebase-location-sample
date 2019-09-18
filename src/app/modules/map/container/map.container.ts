@@ -167,32 +167,29 @@ export class MapContainerComponent implements OnInit {
         this.latlngMarkers[m.id] = m.marker;
         let timer: any;
 
-        m.marker.on('drag', (e: L.LeafletEvent) => {
-          clearTimeout(timer);
-          timer = setTimeout(() => {
-            const marker: Marker = {
-              token: this.token,
-              uid: this.uid,
-              userPhoto: this.userPhoto,
-              color: this.color,
-              id: m.id,
-              lat: e.latlng.lat,
-              lng: e.latlng.lng,
-              task: 'move',
-            };
-            this.markerDocument.update(marker);
-          }, 1000);
-        });
-
-        m.marker.on('click', (e: L.LeafletEvent) => {
+        m.marker.on('dragend', (event: L.LeafletEvent) => {
           const marker: Marker = {
             token: this.token,
             uid: this.uid,
             userPhoto: this.userPhoto,
             color: this.color,
             id: m.id,
-            lat: e.latlng.lat,
-            lng: e.latlng.lng,
+            lat: event.target._latlng.lat,
+            lng: event.target._latlng.lng,
+            task: 'move',
+          };
+          this.markerDocument.update(marker);
+        });
+
+        m.marker.on('click', (event: L.LeafletEvent) => {
+          const marker: Marker = {
+            token: this.token,
+            uid: this.uid,
+            userPhoto: this.userPhoto,
+            color: this.color,
+            id: m.id,
+            lat: event.latlng.lat,
+            lng: event.latlng.lng,
             task: 'remove',
           };
           this.markerDocument.update(marker);
