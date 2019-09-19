@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-input',
@@ -13,7 +13,8 @@ export class InputComponent {
     this.textInput.emit(value);
   }
 
-  handleButtonClick() {
+  handleButtonClick(comment) {
     this.buttonClick.emit();
+    comment.value = '';
   }
 }
