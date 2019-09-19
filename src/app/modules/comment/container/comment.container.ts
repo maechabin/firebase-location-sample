@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { CommentUsecase } from '../../../core/comment.usecase';
+import { CommentUsecase } from '../comment.usecase';
 import { State } from '../../../core/state';
 
 @Component({

@@ -5,8 +5,8 @@ import {
   AngularFirestoreCollection,
 } from '@angular/fire/firestore';
 
-import { UserEntity } from './user.entity';
-import * as entity from './comment.entity';
+import { UserEntity } from '../../core/user.entity';
+import * as entity from '../../core/comment.entity';
 
 @Injectable({
   providedIn: 'root',
