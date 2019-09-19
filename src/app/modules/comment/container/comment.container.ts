@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
 import { CommentUsecase } from '../../../core/comment.usecase';
+import { State } from '../../../core/state';
 
 @Component({
   selector: 'app-comment',
@@ -8,13 +9,14 @@ import { CommentUsecase } from '../../../core/comment.usecase';
     <app-input
       (textInput)="handleTextInput($event)"
       (buttonClick)="handleButtonClick()"
+      [isSharing]="state.isSharing"
     ></app-input>
   `,
 })
 export class CommentContainerComponent {
   comment: string;
 
-  constructor(private commentUsecase: CommentUsecase) {}
+  constructor(private commentUsecase: CommentUsecase, public state: State) {}
 
   handleTextInput(value: string) {
     this.comment = value;

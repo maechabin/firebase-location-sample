@@ -13,6 +13,7 @@ import { LLMap, Marker } from '../../../domains/llmap';
 import * as helper from '../../../core/helpers';
 import { MapService } from '../service/map.service';
 import { LoginService } from '../service/login.service';
+import { State } from '../../../core/state';
 
 type LoginState = 'login' | 'logout';
 interface Comment {
@@ -36,7 +37,6 @@ export class MapContainerComponent implements OnInit {
   locateMarkers: { [token: number]: Marker } = {};
   latlngMarkers: { [id: number]: L.Marker } = {};
   isDisabled = true;
-  isSharing = false;
   marker: Observable<Marker>;
 
   readonly map = new LLMap();
@@ -63,6 +63,7 @@ export class MapContainerComponent implements OnInit {
     private afs: AngularFirestore,
     private mapService: MapService,
     private loginService: LoginService,
+    public state: State,
   ) {
     this.markerDocument = afs.doc<Marker>('marker/GvQyEJEj19tVHvb2vDs0');
     this.marker = this.markerDocument.valueChanges();
@@ -151,7 +152,7 @@ export class MapContainerComponent implements OnInit {
 
     this.map.llmap.on('locationerror', error => {
       console.error(`現在地を取得できませんでした`);
-      this.isSharing = false;
+      this.state.isSharing = false;
       this.isDisabled = false;
     });
   }
@@ -259,12 +260,12 @@ export class MapContainerComponent implements OnInit {
 
   handleButtonClick() {
     this.isDisabled = true;
-    if (this.isSharing) {
+    if (this.state.isSharing) {
       this.map.stopGetLocation();
     } else {
       this.map.getLocation();
     }
-    this.isSharing = !this.isSharing;
+    this.state.isSharing = !this.state.isSharing;
   }
 
   handleListClick(marker: { lat: number; lng: number }) {
