@@ -245,7 +245,7 @@ export class MapContainerComponent implements OnInit {
     Object.values(this.latlngMarkers).forEach((marker: L.Marker) => {
       this.map.llmap.removeLayer(marker);
     });
-    this.handleButtonClick();
+    this.handleShareButtonClick();
     this.afAuth.auth.signOut();
   }
 
@@ -258,7 +258,7 @@ export class MapContainerComponent implements OnInit {
     }
   }
 
-  handleButtonClick() {
+  handleShareButtonClick() {
     this.isDisabled = true;
     if (this.state.isSharing) {
       this.map.stopGetLocation();

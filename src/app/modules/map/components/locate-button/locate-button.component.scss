@@ -10,4 +10,9 @@
   background-color: #d81b60;
   color: #fff;
   cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
