@@ -4,6 +4,9 @@
     type="text"
     placeholder="コメントする"
     (input)="hanndleTextInput($event.target.value)"
+    [disabled]="!isSharing"
   />
-  <button (click)="handleButtonClick(comment)">送信</button>
+  <button (click)="handleButtonClick(comment)" [disabled]="!isSharing">
+    送信
+  </button>
 </div>

@@ -15,6 +15,12 @@
     border: 1px solid #999;
     font-size: 20px;
     padding: 0 8px;
+
+    &:disabled {
+      background-color: #eee;
+      color: #222;
+      cursor: not-allowed;
+    }
   }
 
   button {
@@ -25,5 +31,11 @@
     width: 80px;
     background-color: #1976d2;
     color: #fff;
+
+    &:disabled {
+      background-color: #eee;
+      color: #222;
+      cursor: not-allowed;
+    }
   }
 }
