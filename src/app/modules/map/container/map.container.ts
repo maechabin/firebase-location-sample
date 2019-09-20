@@ -114,25 +114,26 @@ export class MapContainerComponent implements OnInit {
     });
 
     this.map.llmap.on('locationfound', (event: L.LeafletEvent) => {
-      this.isDisabled = true;
       console.log(
         `現在地を取得しました: ${event.latlng.lat}, ${event.latlng.lng}`,
       );
 
-      const marker: Marker = {
-        token: this.token,
-        uid: this.uid,
-        userPhoto: this.userPhoto,
-        color: this.color,
-        id: new Date().getTime(),
-        lat: event.latlng.lat,
-        lng: event.latlng.lng,
-        task: 'location',
-      };
+      const time = new Date().getTime();
 
-      if (!this.timeInterval || marker.id - this.timeInterval > 5000) {
+      if (!this.timeInterval || time - this.timeInterval > 5000) {
+        this.isDisabled = true;
+        const marker: Marker = {
+          token: this.token,
+          uid: this.uid,
+          userPhoto: this.userPhoto,
+          color: this.color,
+          id: time,
+          lat: event.latlng.lat,
+          lng: event.latlng.lng,
+          task: 'location',
+        };
         this.markerDocument.update(marker);
-        this.timeInterval = marker.id;
+        this.timeInterval = time;
       }
     });
 
