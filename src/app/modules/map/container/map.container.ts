@@ -116,9 +116,7 @@ export class MapContainerComponent implements OnInit {
     });
 
     this.map.llmap.on('locationfound', (event: L.LeafletEvent) => {
-      console.log(
-        `現在地を取得しました: ${event.latlng.lat}, ${event.latlng.lng}`,
-      );
+      console.log(`現在地を取得しました: ${event.latlng.lat}, ${event.latlng.lng}`);
 
       const time = new Date().getTime();
 
@@ -209,10 +207,7 @@ export class MapContainerComponent implements OnInit {
         this.map.removeMarker(sendedMarker);
         break;
       case 'location':
-        if (
-          !this.map.locations[sendedMarker.uid] &&
-          sendedMarker.uid === this.uid
-        ) {
+        if (!this.map.locations[sendedMarker.uid] && sendedMarker.uid === this.uid) {
           this.map.panTo(sendedMarker.lat, sendedMarker.lng);
         }
 
@@ -225,10 +220,7 @@ export class MapContainerComponent implements OnInit {
         this.locateMarkers = this.map.locationList;
         setTimeout(() => {
           const comment = this.comments.find(c => c.uid === sendedMarker.uid);
-          this.map.putLocationMarker(
-            sendedMarker,
-            (comment && comment.comment) || `I'm here now`,
-          );
+          this.map.putLocationMarker(sendedMarker, (comment && comment.comment) || `I'm here now`);
         }, 0);
 
         this.isDisabled = false;
