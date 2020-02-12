@@ -1,5 +1,6 @@
 import * as L from 'leaflet';
 
+import * as Constants from './constants';
 import { Marker } from './llmap.model';
 import 'leaflet.gridlayer.googlemutant';
 
@@ -26,40 +27,21 @@ export class LLMap {
   locationList: { [token: number]: Marker } = {};
 
   initMap(elem: any) {
-    const token =
-      'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+    const token = Constants.Token;
     /** Layer */
-    const streetsLayer = L.tileLayer(
-      `
-    https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=${token}
-    `,
-      {
-        attribution: `
-          Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors,
-          <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,
-          Imagery © <a href="https://www.mapbox.com/">Mapbox</a>
-        `,
-        maxZoom: 18,
-        id: 'mapbox.streets', // mapbox.streets | mapbox.satellite
-        accessToken: 'your.mapbox.access.token',
-      },
-    );
+    const streetsLayer = L.tileLayer(Constants.StreetLayer, {
+      attribution: Constants.Attribution,
+      maxZoom: Constants.LayerMaxZoomSize,
+      id: Constants.LayerId.MapboxStreets,
+      accessToken: token,
+    });
 
-    const satelliteLayer = L.tileLayer(
-      `
-    https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=${token}
-    `,
-      {
-        attribution: `
-          Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors,
-          <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,
-          Imagery © <a href="https://www.mapbox.com/">Mapbox</a>
-        `,
-        maxZoom: 18,
-        id: 'mapbox.satellite', // mapbox.streets | mapbox.satellite
-        accessToken: 'your.mapbox.access.token',
-      },
-    );
+    const satelliteLayer = L.tileLayer(Constants.SatelliteLayer, {
+      attribution: Constants.Attribution,
+      maxZoom: Constants.LayerMaxZoomSize,
+      id: Constants.LayerId.MapboxSatellite,
+      accessToken: token,
+    });
 
     const googlemaps = L.gridLayer.googleMutant({
       type: 'roadmap', // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
