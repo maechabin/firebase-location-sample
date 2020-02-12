@@ -47,6 +47,8 @@ export class MapContainerComponent implements OnInit {
   private userPhoto = '';
   private comments: Comment[];
   timeInterval: number;
+  previousLat: number;
+  previousLng: number;
 
   private readonly onDestroy$ = new EventEmitter();
 
@@ -134,6 +136,8 @@ export class MapContainerComponent implements OnInit {
         };
         this.markerDocument.update(marker);
         this.timeInterval = time;
+        this.previousLat = event.latlng.lat;
+        this.previousLng = event.latlng.lng;
       }
     });
 
