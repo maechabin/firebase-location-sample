@@ -6,7 +6,7 @@ import {
   EventEmitter,
 } from '@angular/core';
 
-import { LLMap, Marker } from '../../../../domains/llmap';
+import { LLMap, Marker } from '../../../../../domains/llmap';
 
 @Component({
   selector: 'app-marker-list',

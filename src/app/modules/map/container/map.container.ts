@@ -9,7 +9,7 @@ import { auth } from 'firebase/app';
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { LLMap, Marker } from '../../../domains/llmap';
+import { LLMap, Marker } from '../../../../domains/llmap';
 import * as helper from '../../../core/helpers';
 import { MapService } from '../service/map.service';
 import { LoginService } from '../service/login.service';
