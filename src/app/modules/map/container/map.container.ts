@@ -39,7 +39,7 @@ export class MapContainerComponent implements OnInit {
   isDisabled = true;
   marker: Observable<Marker>;
 
-  readonly map = new LLMap();
+  map: LLMap;
   readonly token = new Date().getTime();
   readonly color = helper.getColorCode();
 
@@ -76,7 +76,7 @@ export class MapContainerComponent implements OnInit {
   ngOnInit() {
     this.el = this.elementRef.nativeElement;
     const mapElem = this.el.querySelector('#map') as HTMLElement;
-    this.map.initMap(mapElem);
+    this.map = new LLMap(mapElem);
 
     this.user$.subscribe(user => {
       if (user) {
@@ -101,7 +101,7 @@ export class MapContainerComponent implements OnInit {
   }
 
   handleMapClick() {
-    this.map.llmap.on('click', (event: L.LeafletEvent) => {
+    this.map.on('click', (event: L.LeafletEvent) => {
       const marker: Marker = {
         token: this.token,
         uid: this.uid,
@@ -115,7 +115,7 @@ export class MapContainerComponent implements OnInit {
       this.markerDocument.update(marker);
     });
 
-    this.map.llmap.on('locationfound', (event: L.LeafletEvent) => {
+    this.map.on('locationfound', (event: L.LeafletEvent) => {
       console.log(`現在地を取得しました: ${event.latlng.lat}, ${event.latlng.lng}`);
 
       const time = new Date().getTime();
@@ -139,7 +139,7 @@ export class MapContainerComponent implements OnInit {
       }
     });
 
-    this.map.llmap.on('locationstop', () => {
+    this.map.on('locationstop', () => {
       const marker: Marker = {
         token: this.token,
         uid: this.uid,
@@ -153,7 +153,7 @@ export class MapContainerComponent implements OnInit {
       this.markerDocument.update(marker);
     });
 
-    this.map.llmap.on('locationerror', error => {
+    this.map.on('locationerror', error => {
       console.error(`現在地を取得できませんでした`);
       this.state.isSharing = false;
       this.isDisabled = false;
@@ -208,7 +208,7 @@ export class MapContainerComponent implements OnInit {
         break;
       case 'location':
         if (!this.map.locations[sendedMarker.uid] && sendedMarker.uid === this.uid) {
-          this.map.panTo(sendedMarker.lat, sendedMarker.lng);
+          this.map.pan(sendedMarker.lat, sendedMarker.lng);
         }
 
         if (!this.map.locationList[sendedMarker.uid]) {
@@ -240,7 +240,7 @@ export class MapContainerComponent implements OnInit {
 
   logout() {
     Object.values(this.latlngMarkers).forEach((marker: L.Marker) => {
-      this.map.llmap.removeLayer(marker);
+      this.map.removeLayer(marker);
     });
     this.handleShareButtonClick();
     this.afAuth.auth.signOut();
@@ -266,6 +266,6 @@ export class MapContainerComponent implements OnInit {
   }
 
   handleListClick(marker: { lat: number; lng: number }) {
-    this.map.panTo(marker.lat, marker.lng);
+    this.map.pan(marker.lat, marker.lng);
   }
 }

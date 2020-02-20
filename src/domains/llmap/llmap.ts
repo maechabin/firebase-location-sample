@@ -18,50 +18,61 @@ interface Comment {
   // date: number;
 }
 
-export class LLMap {
-  llmap!: L.Map;
+export class LLMap extends L.Map {
+  /** Layers */
+  private readonly streetsLayer = this.createTileLayer(Constants.LayerId.MapboxStreets);
+  private readonly satelliteLayer = this.createTileLayer(Constants.LayerId.MapboxSatellite);
+  private readonly googlemaps = L.gridLayer.googleMutant({
+    type: 'roadmap', // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
+  });
+
   markers: {
     [id: number]: L.Marker;
   } = {};
   locations: { [token: number]: L.Marker } = {};
   locationList: { [token: number]: Marker } = {};
 
-  initMap(elem: any) {
-    const token = Constants.Token;
-    /** Layer */
-    const streetsLayer = L.tileLayer(Constants.StreetLayer, {
-      attribution: Constants.Attribution,
-      maxZoom: Constants.LayerMaxZoomSize,
-      id: Constants.LayerId.MapboxStreets,
-      accessToken: token,
-    });
+  constructor(elem: HTMLElement) {
+    super(elem);
 
-    const satelliteLayer = L.tileLayer(Constants.SatelliteLayer, {
-      attribution: Constants.Attribution,
-      maxZoom: Constants.LayerMaxZoomSize,
-      id: Constants.LayerId.MapboxSatellite,
-      accessToken: token,
-    });
+    this.setView(
+      Constants.DefaultCenteringPosition as L.LatLngExpression,
+      Constants.DefaultZoomSize,
+    ).addLayer(this.streetsLayer);
 
-    const googlemaps = L.gridLayer.googleMutant({
-      type: 'roadmap', // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
-    });
+    this.addLayerToControl();
+  }
 
-    this.llmap = L.map(elem)
-      .setView([35.69432984468491, 139.74267643565133], 12)
-      .addLayer(streetsLayer);
-
+  private addLayerToControl(): void {
     L.control
       .layers(
         {
-          street: streetsLayer,
-          satellite: satelliteLayer,
-          'google maps': googlemaps,
+          street: this.streetsLayer,
+          satellite: this.satelliteLayer,
+          'google maps': this.googlemaps,
         },
         {},
         { position: 'bottomright' },
       )
-      .addTo(this.llmap);
+      .addTo(this);
+  }
+
+  private createTileLayer(layerId: Constants.LayerId): L.Layer {
+    let layerUrl: string;
+    switch (layerId) {
+      case Constants.LayerId.MapboxStreets:
+        layerUrl = Constants.StreetLayer;
+        break;
+      case Constants.LayerId.MapboxSatellite:
+        layerUrl = Constants.SatelliteLayer;
+        break;
+    }
+    return L.tileLayer(layerUrl, {
+      attribution: Constants.Attribution,
+      maxZoom: Constants.LayerMaxZoomSize,
+      id: layerId,
+      accessToken: Constants.Token,
+    });
   }
 
   putMarker(marker: Marker): { id: number; marker: L.Marker } {
@@ -94,7 +105,7 @@ export class LLMap {
     this.markers[marker.id] = L.marker([marker.lat, marker.lng], {
       icon,
       draggable: true,
-    }).addTo(this.llmap);
+    }).addTo(this);
 
     return { id: marker.id, marker: this.markers[marker.id] };
   }
@@ -104,12 +115,12 @@ export class LLMap {
   }
 
   removeMarker(marker: Marker) {
-    this.llmap.removeLayer(this.markers[marker.id]);
+    this.removeLayer(this.markers[marker.id]);
   }
 
   getLocation() {
-    if (this.llmap && this.llmap.locate) {
-      this.llmap.locate({
+    if (this.locate) {
+      this.locate({
         watch: true,
         enableHighAccuracy: true,
         maximumAge: 5000,
@@ -118,12 +129,12 @@ export class LLMap {
   }
 
   stopGetLocation() {
-    this.llmap.stopLocate();
-    this.llmap.fire('locationstop');
+    this.stopLocate();
+    this.fire('locationstop');
   }
 
   removeLacateMarker(uid: string) {
-    this.llmap.removeLayer(this.locations[uid]);
+    this.removeLayer(this.locations[uid]);
   }
 
   putLocationMarker(marker: Marker, comment: string) {
@@ -146,15 +157,15 @@ export class LLMap {
     });
 
     if (this.locations[marker.uid]) {
-      this.llmap.removeLayer(this.locations[marker.uid]);
+      this.removeLayer(this.locations[marker.uid]);
     }
     this.locations[marker.uid] = L.marker([marker.lat, marker.lng], {
       icon,
       draggable: false,
     })
-      .addTo(this.llmap)
+      .addTo(this)
       .on('click', () => {
-        this.panTo(marker.lat, marker.lng);
+        this.pan(marker.lat, marker.lng);
       })
       .bindPopup(comment, {
         closeButton: false,
@@ -173,7 +184,7 @@ export class LLMap {
     });
   }
 
-  panTo(lat: number, lng: number) {
-    this.llmap.panTo(new L.LatLng(lat, lng));
+  pan(lat: number, lng: number) {
+    this.panTo(new L.LatLng(lat, lng));
   }
 }
