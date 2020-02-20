@@ -4,8 +4,6 @@ import {
   AngularFirestoreDocument,
   AngularFirestoreCollection,
 } from '@angular/fire/firestore';
-import { AngularFireAuth } from '@angular/fire/auth';
-import { auth } from 'firebase/app';
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -56,15 +54,13 @@ export class MapContainerComponent implements OnInit {
     return Object.values(this.locateMarkers).length;
   }
 
-  user$ = this.afAuth.user;
   comments$: Observable<Comment[]>;
 
   constructor(
-    public afAuth: AngularFireAuth,
     private elementRef: ElementRef,
     private afs: AngularFirestore,
     private mapService: MapService,
-    private loginService: LoginService,
+    public loginService: LoginService,
     public state: State,
   ) {
     this.markerDocument = afs.doc<Marker>('marker/GvQyEJEj19tVHvb2vDs0');
@@ -78,7 +74,7 @@ export class MapContainerComponent implements OnInit {
     const mapElem = this.el.querySelector('#map') as HTMLElement;
     this.map = new LLMap(mapElem);
 
-    this.user$.subscribe(user => {
+    this.loginService.user$.subscribe(user => {
       if (user) {
         this.uid = user.uid;
         this.userPhoto = user.photoURL;
@@ -234,21 +230,17 @@ export class MapContainerComponent implements OnInit {
     }
   }
 
-  login() {
-    this.afAuth.auth.signInWithPopup(new auth.GoogleAuthProvider());
-  }
-
   logout() {
     Object.values(this.latlngMarkers).forEach((marker: L.Marker) => {
       this.map.removeLayer(marker);
     });
     this.handleShareButtonClick();
-    this.afAuth.auth.signOut();
+    this.loginService.logout();
   }
 
   handleLoginButtonClick(loginState: LoginState) {
     if (loginState === 'login') {
-      this.login();
+      this.loginService.login();
     }
     if (loginState === 'logout') {
       this.logout();

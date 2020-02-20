@@ -1,5 +1,5 @@
 <div id="map">...</div>
-<div *ngIf="user$ | async as user; else showLogin">
+<div *ngIf="loginService.user$ | async as user; else showLogin">
   <app-marker-list
     [map]="map"
     [markers]="locateMarkers"
