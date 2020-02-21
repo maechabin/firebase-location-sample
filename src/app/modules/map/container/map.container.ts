@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { LLMap, Marker } from '../../../../domains/llmap';
+import { LocationList } from '../../../../domains/location/location-list';
 import * as helper from '../../../core/helpers';
 import { MapService } from '../service/map.service';
 import { LoginService } from '../service/login.service';
@@ -32,14 +33,13 @@ export class MapContainerComponent implements OnInit {
   private markerDocument: AngularFirestoreDocument<Marker>;
   private commentsCollection: AngularFirestoreCollection<Comment>;
 
-  locateMarkers: { [token: number]: Marker } = {};
   latlngMarkers: { [id: number]: L.Marker } = {};
   isDisabled = true;
-  marker: Observable<Marker>;
 
   map: LLMap;
   readonly token = new Date().getTime();
   readonly color = helper.getColorCode();
+  readonly locationList = new LocationList();
 
   private uid = '';
   private userPhoto = '';
@@ -50,8 +50,10 @@ export class MapContainerComponent implements OnInit {
 
   private readonly onDestroy$ = new EventEmitter();
 
-  get markerListLength() {
-    return Object.values(this.locateMarkers).length;
+  get colors() {
+    return this.locationList.getArray().map(marker => {
+      return { 'box-shadow': `0 0 0 8px ${marker.color[1]}` };
+    });
   }
 
   comments$: Observable<Comment[]>;
@@ -207,13 +209,9 @@ export class MapContainerComponent implements OnInit {
           this.map.pan(sendedMarker.lat, sendedMarker.lng);
         }
 
-        if (!this.map.locationList[sendedMarker.uid]) {
-          this.map.locationList = {
-            ...this.map.locationList,
-            [sendedMarker.uid]: sendedMarker,
-          };
+        if (!this.locationList[sendedMarker.uid]) {
+          this.locationList.add(sendedMarker);
         }
-        this.locateMarkers = this.map.locationList;
         setTimeout(() => {
           const comment = this.comments.find(c => c.uid === sendedMarker.uid);
           this.map.putLocationMarker(sendedMarker, (comment && comment.comment) || `I'm here now`);
@@ -222,8 +220,7 @@ export class MapContainerComponent implements OnInit {
         this.isDisabled = false;
         break;
       case 'removeLocation':
-        delete this.map.locationList[sendedMarker.uid];
-        this.locateMarkers = this.map.locationList;
+        this.locationList.delete(sendedMarker);
         this.map.removeLacateMarker(sendedMarker.uid);
         this.isDisabled = false;
         break;

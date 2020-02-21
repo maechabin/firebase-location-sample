@@ -1,13 +1,13 @@
-<ng-container *ngIf="markers && markerList.length !== 0">
+<ng-container *ngIf="locationList.length > 0">
   <ul class="ul">
     <li
-      *ngFor="let marker of markerList; let i = index"
-      (click)="handleListClick({ lat: marker.lat, lng: marker.lng })"
+      *ngFor="let location of locationList; let i = index"
+      (click)="handleListClick({ lat: location.lat, lng: location.lng })"
       class="li"
     >
       <img
-        [src]="marker.userPhoto"
-        [style.background-color]="marker.color[0]"
+        [src]="location.userPhoto"
+        [style.background-color]="location.color[0]"
         [ngStyle]="colors[i]"
         class="img"
       />

@@ -30,7 +30,6 @@ export class LLMap extends L.Map {
     [id: number]: L.Marker;
   } = {};
   locations: { [token: number]: L.Marker } = {};
-  locationList: { [token: number]: Marker } = {};
 
   constructor(elem: HTMLElement) {
     super(elem);

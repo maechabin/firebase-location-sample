@@ -1,9 +1,8 @@
 <div id="map">...</div>
 <div *ngIf="loginService.user$ | async as user; else showLogin">
   <app-marker-list
-    [map]="map"
-    [markers]="locateMarkers"
-    [markerListLength]="markerListLength"
+    [locationList]="locationList.getArray()"
+    [colors]="colors"
     (listClick)="handleListClick($event)"
   ></app-marker-list>
   <app-locate-button
